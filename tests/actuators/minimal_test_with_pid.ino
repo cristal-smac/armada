@@ -1,4 +1,5 @@
-// Motor control pins
+// NOT WORKING for now !!!!!!!!
+//  Motor control pins
 const int motorPin1 = 26;   // IN1 on the motor driver
 const int motorPin2 = 27;   // IN2 on the motor driver
 const int enablePin = 25;   // ENA on the motor driver
