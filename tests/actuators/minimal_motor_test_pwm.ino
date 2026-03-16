@@ -1,6 +1,6 @@
 // Motor control pins
 const int motorPin1 = 2;  // IN3 on the motor driver
-const int motorPin2 = 4;  // IN4 on the motor driver
+const int motorPin2 = 15; // IN4 on the motor driver
 const int enablePin = 18; // ENB on the motor driver
 
 // pwm parameters setup
