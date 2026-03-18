@@ -6,7 +6,7 @@ SMS_STS sms_sts;
 #define S_TXD 17
 
 int TEST_ID = 1;
-int SPEED = 1500; // Vitesse de rotation (ajuste cette valeur selon tes besoins)
+int SPEED = 1500; 
 
 void setup()
 {
@@ -19,7 +19,7 @@ void setup()
 
 void loop()
 {
-  // Faire tourner le servo à une vitesse fixe pendant 3 secondes
+  //set speed
   int result = sms_sts.WritePosEx(TEST_ID, 4095, SPEED, 0); // 4095 pour position, inutile???
   if (result == -1)
   {
@@ -28,7 +28,7 @@ void loop()
   else
   {
     Serial.print("Rotation à vitesse fixe pendant 3 secondes...");
-    delay(3000); // Attendre 3 secondes
+    delay(3000); 
   }
 
   // Arrêter le servo pendant 2 secondes
@@ -40,6 +40,6 @@ void loop()
   else
   {
     Serial.println("Servo arrêté pendant 2 secondes...");
-    delay(2000); // Attendre 2 secondes
+    delay(2000); 
   }
 }
