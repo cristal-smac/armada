@@ -1,28 +1,39 @@
-#include "Motor.h"
+#include "Robot.h"
 
-// motors_vars
+#define WHEEL_DIAMETER 0.065f // meters - TODO recheck les vrais dimensions
+#define ROBOT_WIDTH 0.18f     // meters - TODO recheck les vrais dimensions
+#define MAX_RPM 60.0f
+
 #define LEFT_MOTOR_ID 1
 #define RIGHT_MOTOR_ID 2
 #define RX_MOTORS 16
 #define TX_MOTORS 17
 #define MOTORS_BAUDRATE 1000000
 
-Motor leftmotor(LEFT_MOTOR_ID, RX_MOTORS, TX_MOTORS, MOTORS_BAUDRATE);
-Motor rightmotor(RIGHT_MOTOR_ID, RX_MOTORS, TX_MOTORS, MOTORS_BAUDRATE);
+Robot robot(WHEEL_DIAMETER, ROBOT_WIDTH, MAX_RPM,
+            LEFT_MOTOR_ID, RIGHT_MOTOR_ID,
+            RX_MOTORS, TX_MOTORS, MOTORS_BAUDRATE);
 
 void setup()
 {
     Serial.begin(115200);
-    leftmotor.init();
-    rightmotor.init();
+    robot.init();
 }
 
-void loop() // TODO : faire une classe robot pour mettre des vitesses en cmd vel
+void loop()
 {
-    leftmotor.set_rpm_speed(30.0f);  // 30 RPM -> 1 roll every 2 secs
-    rightmotor.set_rpm_speed(30.0f); // 30 RPM -> 1 roll every 2 secs
+    // 0.1 m/s forward
+    robot.set_velocity(0.1f, 0.0f);
     delay(3000);
-    leftmotor.stop();
-    rightmotor.stop();
+
+    // just rotation
+    robot.set_velocity(0.0f, 0.5f);
+    delay(2000);
+
+    // Read current velocities
+    float vx, vw;
+    robot.get_velocities(vx, vw);
+
+    robot.stop();
     delay(2000);
 }
