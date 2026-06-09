@@ -38,15 +38,13 @@ bool Motor::init()
 
 bool Motor::set_rpm_speed(float rpm)
 {
-    if (rpm < 0.0f)
-        rpm = 0.0f;
     if (rpm > MAX_RPM)
         rpm = MAX_RPM;
 
     int ticks = rpm_to_ticks(rpm);
     // Serial.printf("[Motor %d] set_rpm_speed(%.2f RPM) → %d ticks/s\n", _id, rpm, ticks);
 
-    int result = _sms_sts.WritePosEx(_id, 4095, ticks, 0);
+    int result = _sms_sts.WritePosEx(_id, 4095, ticks, 20);
     if (result == -1)
     {
         Serial.printf("[Motor %d] Erreur : impossible de régler la vitesse\n", _id);
@@ -70,7 +68,7 @@ float Motor::get_speed_rpm()
 
 bool Motor::stop()
 {
-    int result = _sms_sts.WritePosEx(_id, 0, 0, 0);
+    int result = _sms_sts.WritePosEx(_id, 0, 0, 20);
     if (result == -1)
     {
         Serial.printf("[Motor %d] Erreur : impossible d'arrêter le moteur\n", _id);

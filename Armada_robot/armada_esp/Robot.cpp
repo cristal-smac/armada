@@ -37,6 +37,7 @@ Robot::Robot(float wheel_diameter,
 void Robot::init()
 {
     _left_motor.init();
+    delay(20);
     _right_motor.init();
 }
 
@@ -57,18 +58,20 @@ void Robot::set_velocity(float vx, float vw)
     }
     else
     {
-        rpm_right = -rpm_right
-    };
+        rpm_right = -rpm_right;
+    }
 
     // Serial.printf("[Robot] vx=%.3f m/s  vw=%.3f rad/s → rpm_L=%.2f  rpm_R=%.2f\n", vx, vw, rpm_left, rpm_right);
 
     _left_motor.set_rpm_speed(rpm_left);
+    delay(20);
     _right_motor.set_rpm_speed(rpm_right);
 }
 
 void Robot::get_velocities(float &vx, float &vw)
 {
     float rpm_left = _left_motor.get_speed_rpm();
+    delay(20);
     float rpm_right = _right_motor.get_speed_rpm();
 
     if (_left_inverted)
@@ -77,8 +80,8 @@ void Robot::get_velocities(float &vx, float &vw)
     }
     else
     {
-        rpm_right = -rpm_right
-    };
+        rpm_right = -rpm_right;
+    }
 
     float v_left = rpm_to_wheel_speed(rpm_left);
     float v_right = rpm_to_wheel_speed(rpm_right);
