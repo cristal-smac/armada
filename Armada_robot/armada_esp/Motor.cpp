@@ -3,12 +3,12 @@
 
 int Motor::rpm_to_ticks(float rpm) const
 {
-    return static_cast<int>(rpm / 60.0f * TICKS_PER_REV);
+    return static_cast<int>((rpm / 60.0f) * TICKS_PER_REV);
 }
 
 float Motor::ticks_to_rpm(int ticks) const
 {
-    return static_cast<float>(ticks) * 60.0f / TICKS_PER_REV;
+    return static_cast<float>((ticks * 60.0f) / TICKS_PER_REV);
 }
 
 // ─── Public ──────────────────────────────────────────────────────────────────
@@ -33,23 +33,33 @@ bool Motor::init()
         Serial.printf("[Motor %d] Erreur init\n", _id);
         return false;
     }
+    _sms_sts.EnableTorque(_id, 1);
+    delay(500);
+    _sms_sts.WheelMode(_id);
+    delay(500);
+    
     return true;
 }
 
 bool Motor::set_rpm_speed(float rpm)
 {
-    if (rpm > MAX_RPM)
-        rpm = MAX_RPM;
+    rpm = constrain(rpm, -MAX_RPM, MAX_RPM);
 
     int ticks = rpm_to_ticks(rpm);
-    // Serial.printf("[Motor %d] set_rpm_speed(%.2f RPM) → %d ticks/s\n", _id, rpm, ticks);
-
-    int result = _sms_sts.WritePosEx(_id, 4095, ticks, 20);
-    if (result == -1)
+    //Serial.printf("[Motor %d] set_rpm_speed(%.2f RPM) → %d ticks/s\n", _id, rpm, ticks);
+    int result = -1;
+    while (result == -1)
     {
-        Serial.printf("[Motor %d] Erreur : impossible de régler la vitesse\n", _id);
-        return false;
+        //result = _sms_sts.WritePosEx(_id, 4095, ticks, 20);
+        result =_sms_sts.WriteSpe(_id, ticks, 20);
     }
+
+    // result = _sms_sts.WritePosEx(_id, 4095, ticks, 20);
+    // if (result == -1)
+    // {
+    //     Serial.printf("[Motor %d] Erreur : impossible de régler la vitesse\n", _id);
+    //     return false;
+    // }
     return true;
 }
 
@@ -58,7 +68,7 @@ float Motor::get_speed_rpm()
     int ticks = _sms_sts.ReadSpeed(_id);
     if (ticks == -1)
     {
-        Serial.printf("[Motor %d] Erreur : impossible de lire la vitesse\n", _id);
+        //Serial.printf("[Motor %d] Erreur : impossible de lire la vitesse\n", _id);
         return -1.0f;
     }
     float rpm = ticks_to_rpm(ticks);
