@@ -34,6 +34,10 @@ Robot::Robot(float wheel_diameter,
       _robot_width(robot_width),
       _max_rpm(max_rpm),
       _left_inverted(left_inverted),
+      _command_timeout_ms(500),
+      _last_command_ms(0),
+      _moving(false),
+      _timeout_logged(false),
       _lidar(tof_mux_address, tof_sda, tof_scl)
 {
 }
@@ -57,7 +61,7 @@ void Robot::init()
     _lidar.init();
 }
 
-void Robot::set_velocity(float vx, float vw)
+bool Robot::set_velocity(float vx, float vw)
 {
     float v_left = vx - (vw * _robot_width / 2.0f);
     float v_right = vx + (vw * _robot_width / 2.0f);
@@ -79,9 +83,21 @@ void Robot::set_velocity(float vx, float vw)
 
     //Serial.printf("[Robot] vx=%.3f m/s  vw=%.3f rad/s → rpm_L=%.2f  rpm_R=%.2f\n", vx, vw, rpm_left, rpm_right);
 
-    _left_motor.set_rpm_speed(rpm_left);
+    bool left_ok = _left_motor.set_rpm_speed(rpm_left);
     delay(20);
-    _right_motor.set_rpm_speed(rpm_right);
+    bool right_ok = _right_motor.set_rpm_speed(rpm_right);
+
+    if (!left_ok || !right_ok)
+    {
+        // Ne jamais rouler sur une seule roue : on coupe les deux moteurs.
+        stop();
+        return false;
+    }
+
+    _last_command_ms = millis();
+    _moving = (rpm_left != 0.0f || rpm_right != 0.0f);
+    _timeout_logged = false;
+    return true;
 }
 
 void Robot::get_velocities(float &vx, float &vw)
@@ -110,8 +126,34 @@ void Robot::get_velocities(float &vx, float &vw)
 
 void Robot::stop()
 {
-    _left_motor.stop();
-    _right_motor.stop();
+    bool left_ok = _left_motor.stop();
+    bool right_ok = _right_motor.stop();
+
+    // Si un arrêt échoue, on reste "en mouvement" : update() réessaiera au prochain tour.
+    _moving = !(left_ok && right_ok);
+}
+
+void Robot::set_command_timeout(uint32_t timeout_ms)
+{
+    _command_timeout_ms = timeout_ms;
+}
+
+void Robot::update()
+{
+    if (!_moving || _command_timeout_ms == 0)
+    {
+        return;
+    }
+
+    if (millis() - _last_command_ms > _command_timeout_ms)
+    {
+        if (!_timeout_logged)
+        {
+            Serial.println("[Robot] aucune commande recue, arret des moteurs");
+            _timeout_logged = true;
+        }
+        stop();
+    }
 }
 
 uint8_t Robot::get_lidar_values(float *values, uint8_t capacity) const

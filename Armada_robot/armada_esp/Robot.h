@@ -39,8 +39,12 @@ public:
      * diff drive speed.
      * @param vx  linear speed in m/s
      * @param vw  angular speed in rad/s
+     * @return false si un moteur n'a pas répondu : les deux moteurs sont alors arrêtés
+     *         (le robot ne roule jamais sur une seule roue).
+     *
+     * Chaque appel relance le délai de sécurité (voir set_command_timeout).
      */
-    void set_velocity(float vx, float vw);
+    bool set_velocity(float vx, float vw);
 
     /**
      * diff drive speed.
@@ -51,6 +55,19 @@ public:
 
     /** stops the motors */
     void stop();
+
+    /**
+     * Sécurité : si le robot roule et qu'aucun set_velocity() n'arrive pendant
+     * @p timeout_ms, update() arrête les moteurs (déconnexion, plantage de l'interface...).
+     * 0 désactive la sécurité. Valeur par défaut : 500 ms.
+     */
+    void set_command_timeout(uint32_t timeout_ms);
+
+    /**
+     * À appeler à chaque tour de loop(), même sans nouvelle commande :
+     * applique la sécurité ci-dessus.
+     */
+    void update();
 
     /**
      * Lidar ToF du robot : indique quel capteur voit quelle distance.
@@ -84,6 +101,11 @@ private:
     float _robot_width;         // distance between wheels (in m)
     float _max_rpm;
     bool _left_inverted;
+
+    uint32_t _command_timeout_ms; // 0 = sécurité désactivée
+    uint32_t _last_command_ms;    // instant du dernier set_velocity() réussi
+    bool _moving;                 // true si une consigne non nulle est active (ou si un arrêt a échoué)
+    bool _timeout_logged;         // évite de répéter le message de sécurité
 
     TofLidar _lidar;
 };

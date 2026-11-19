@@ -14,6 +14,8 @@ public:
 private:
     static constexpr float TICKS_PER_REV = 4095.0f; // STS3215 servo spec 4095 tic for 1 revolution
     static constexpr float MAX_RPM = 60.0f;
+    static constexpr int SPEED_ATTEMPTS = 2; // essais pour une consigne de vitesse
+    static constexpr int STOP_ATTEMPTS = 3;  // essais pour un arrêt (plus important)
 
     int rpm_to_ticks(float rpm) const;
     float ticks_to_rpm(int ticks) const;
