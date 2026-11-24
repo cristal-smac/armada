@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!-- GÉNÉRÉ par scripts/make_description.py à partir de l'export Fusion 360 : ne pas éditer à la main. -->
+<!-- Repère REP-103 : x avant, y gauche, z haut. base_link = milieu de l'axe des roues. Unités SI. -->
+<robot name="armada">
+  <material name="armada_printed"><color rgba="0.20 0.20 0.22 1"/></material>
+  <material name="armada_battery"><color rgba="0.85 0.72 0.10 1"/></material>
+  <material name="armada_electronics"><color rgba="0.15 0.50 0.75 1"/></material>
+  <material name="armada_wheel"><color rgba="0.12 0.12 0.12 1"/></material>
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/><child link="base_link"/>
+    <origin xyz="0 0 0.0385963" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.0309103 -1.69877e-05 0.0188973" rpy="0 0 0"/>
+      <mass value="0.5"/> <!-- estimation, à peser -->
+      <inertia ixx="0.000605351" ixy="0" ixz="0" iyy="0.00100097" iyz="0" izz="0.000983622"/>
+    </inertial>
+    <visual><geometry><mesh filename="package://armada_description/meshes/base_printed.stl"/></geometry><material name="armada_printed"/></visual>
+    <visual><geometry><mesh filename="package://armada_description/meshes/base_battery.stl"/></geometry><material name="armada_battery"/></visual>
+    <visual><geometry><mesh filename="package://armada_description/meshes/base_electronics.stl"/></geometry><material name="armada_electronics"/></visual>
+    <collision><origin xyz="0.0398821 -4.99992e-05 0.00939784" rpy="0 0 0"/><geometry><box size="0.127799 0.08 0.053"/></geometry></collision>
+    <collision><origin xyz="0.0267326 -0.000149999 0.0629478" rpy="0 0 0"/><geometry><box size="0.0995 0.0784 0.0141"/></geometry></collision>
+  </link>
+
+  <link name="wheel_left_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.035"/> <!-- estimation, à peser -->
+      <inertia ixx="1.32709e-05" ixy="0" ixz="0" iyy="2.60693e-05" iyz="0" izz="1.32709e-05"/>
+    </inertial>
+    <visual><geometry><mesh filename="package://armada_description/meshes/wheel_left.stl"/></geometry><material name="armada_wheel"/></visual>
+    <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.0385963" length="0.009"/></geometry></collision>
+  </link>
+  <joint name="wheel_left_joint" type="continuous">
+    <parent link="base_link"/><child link="wheel_left_link"/>
+    <origin xyz="0 0.04775 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/> <!-- rotation positive = le robot avance -->
+    <limit effort="2.5" velocity="5"/>
+  </joint>
+
+  <link name="wheel_right_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.035"/> <!-- estimation, à peser -->
+      <inertia ixx="1.32709e-05" ixy="0" ixz="0" iyy="2.60693e-05" iyz="0" izz="1.32709e-05"/>
+    </inertial>
+    <visual><geometry><mesh filename="package://armada_description/meshes/wheel_right.stl"/></geometry><material name="armada_wheel"/></visual>
+    <collision><origin xyz="0 0 0" rpy="1.5708 0 0"/><geometry><cylinder radius="0.0385963" length="0.009"/></geometry></collision>
+  </link>
+  <joint name="wheel_right_joint" type="continuous">
+    <parent link="base_link"/><child link="wheel_right_link"/>
+    <origin xyz="-1.05491e-05 -0.04775 -6.9952e-06" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/> <!-- rotation positive = le robot avance -->
+    <limit effort="2.5" velocity="5"/>
+  </joint>
+
+  <link name="caster_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="4.5e-07" ixy="0" ixz="0" iyy="4.5e-07" iyz="0" izz="4.5e-07"/>
+    </inertial>
+    <visual><geometry><mesh filename="package://armada_description/meshes/caster.stl"/></geometry><material name="armada_printed"/></visual>
+    <collision><geometry><sphere radius="0.0075"/></geometry></collision>
+  </link>
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/><child link="caster_link"/>
+    <origin xyz="0.0676914 0.000269113 -0.0311022" rpy="0 0 0"/> <!-- origine = centre de la bille -->
+  </joint>
+
+  <!-- Anneau de 8 VL53L0X : x du repère = axe optique (vers l'extérieur) ; canaux PCA9548A 0..7 = F FL L BL B BR R FR -->
+  <link name="lidar_link"/>
+  <joint name="lidar_link_joint" type="fixed">
+    <parent link="base_link"/><child link="lidar_link"/>
+    <origin xyz="0.0192271 -0.000103988 0.0643814" rpy="0 0 0"/> <!-- centre de l'anneau : repère du LaserScan fusionné -->
+  </joint>
+  <link name="tof_f_link"/>
+  <joint name="tof_f_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_f_link"/>
+    <origin xyz="0.0547993 -8.18603e-05 0.0643814" rpy="0 0 0"/>
+  </joint>
+  <link name="tof_fl_link"/>
+  <joint name="tof_fl_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_fl_link"/>
+    <origin xyz="0.0452794 0.0257982 0.0643814" rpy="0 0 0.785398"/>
+  </joint>
+  <link name="tof_l_link"/>
+  <joint name="tof_l_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_l_link"/>
+    <origin xyz="0.0194315 0.0334503 0.0643814" rpy="0 0 1.5708"/>
+  </joint>
+  <link name="tof_bl_link"/>
+  <joint name="tof_bl_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_bl_link"/>
+    <origin xyz="-0.00655156 0.025869 0.0643814" rpy="0 0 2.35619"/>
+  </joint>
+  <link name="tof_b_link"/>
+  <joint name="tof_b_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_b_link"/>
+    <origin xyz="-0.0173007 -8.18601e-05 0.0643814" rpy="0 0 3.14159"/>
+  </joint>
+  <link name="tof_br_link"/>
+  <joint name="tof_br_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_br_link"/>
+    <origin xyz="-0.00662227 -0.0261034 0.0643814" rpy="0 0 -2.35619"/>
+  </joint>
+  <link name="tof_r_link"/>
+  <joint name="tof_r_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_r_link"/>
+    <origin xyz="0.0194315 -0.0336497 0.0643814" rpy="0 0 -1.5708"/>
+  </joint>
+  <link name="tof_fr_link"/>
+  <joint name="tof_fr_link_joint" type="fixed">
+    <parent link="base_link"/><child link="tof_fr_link"/>
+    <origin xyz="0.0453501 -0.0260327 0.0643814" rpy="0 0 -0.785398"/>
+  </joint>
+
+  <!-- HC-SR04 de détection du sol : incliné vers le bas (pitch positif = vers le sol), x = axe du capteur -->
+  <link name="ultrasonic_link"/>
+  <joint name="ultrasonic_link_joint" type="fixed">
+    <parent link="base_link"/><child link="ultrasonic_link"/>
+    <origin xyz="0.0979063 -0.000191649 -0.00881557" rpy="0 0.785398 0"/>
+  </joint>
+
+  <!-- IMU BNO055 : POSITION ET ORIENTATION SUPPOSÉES (carte plate au centre du plateau sup., axes alignés sur le robot) -->
+  <link name="imu_link"/>
+  <joint name="imu_link_joint" type="fixed">
+    <parent link="base_link"/><child link="imu_link"/>
+    <origin xyz="0.0111329 8.19205e-05 0.0599828" rpy="0 0 0"/>
+  </joint>
+</robot>
