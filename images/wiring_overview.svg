@@ -1,0 +1,90 @@
+<svg viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg"><style>
+:root{}
+text{font-family:'Segoe UI',Arial,sans-serif;fill:#111c1b}
+.t{font-size:14px;font-weight:600}.s{font-size:12px;fill:#546461}.m{font-family:Consolas,monospace;font-size:11.5px}
+.node{fill:#fff;stroke:#8fa09c;stroke-width:1.5}
+.plan{fill:#f3f6f5;stroke:#8fa09c;stroke-width:1.5;stroke-dasharray:5 4}
+.hot{fill:#dcefed;stroke:#0a6c6a;stroke-width:1.5}
+.w{fill:none;stroke-width:2.4;stroke-linejoin:round}
+.pwr{stroke:#b3530c}.uart{stroke:#0a6c6a}.i2c{stroke:#5b4bc4}.gnd{stroke:#8fa09c}.dash{stroke-dasharray:6 4}
+.dot{fill:#b3530c}
+</style><rect width="1000" height="540" fill="#fff"/>
+    <!-- puissance -->
+    <rect class="node" x="20" y="196" width="120" height="68" rx="4"/>
+    <text class="t" x="80" y="226" text-anchor="middle">Battery</text>
+    <text class="s" x="80" y="246" text-anchor="middle">12 V</text>
+    <rect class="node" x="176" y="210" width="96" height="40" rx="4"/>
+    <text class="t" x="224" y="228" text-anchor="middle">Switch</text>
+    <text class="s" x="224" y="243" text-anchor="middle">cuts everything</text>
+    <path class="w pwr" d="M140 230 H176 M272 230 H308 M308 102 V452"/>
+    <path class="w pwr" d="M308 102 H340 M308 452 H340"/>
+    <circle class="dot" cx="308" cy="230" r="5"/>
+
+    <!-- driver + moteurs -->
+    <rect class="hot" x="340" y="56" width="240" height="92" rx="4"/>
+    <text class="t" x="460" y="82" text-anchor="middle">Waveshare Bus Servo Adapter (A)</text>
+    <text class="s" x="460" y="102" text-anchor="middle">pin mode (UART), not USB</text>
+    <text class="s" x="460" y="120" text-anchor="middle">12 V input · servo bus</text>
+    <text class="s" x="460" y="138" text-anchor="middle">jumper on position A (UART)</text>
+    <rect class="node" x="660" y="56" width="170" height="44" rx="4"/>
+    <text class="t" x="745" y="74" text-anchor="middle">STS3215 · ID 2</text>
+    <text class="s" x="745" y="91" text-anchor="middle">left wheel (inverted)</text>
+    <rect class="node" x="660" y="104" width="170" height="44" rx="4"/>
+    <text class="t" x="745" y="122" text-anchor="middle">STS3215 · ID 1</text>
+    <text class="s" x="745" y="139" text-anchor="middle">right wheel</text>
+    <path class="w uart" d="M580 78 H660 M580 126 H660"/>
+    <text class="s" x="842" y="94">3-wire cables</text>
+    <text class="s" x="842" y="110">D / V / G, keyed</text>
+
+    <!-- UART -->
+    <path class="w uart" d="M400 148 V250 M460 148 V250"/>
+    <path class="w gnd" d="M520 148 V250"/>
+    <text class="m" x="408" y="204">TX</text>
+    <text class="m" x="468" y="204">RX</text>
+    <text class="m" x="528" y="204">GND</text>
+    <text class="s" x="600" y="204">UART 1 Mbaud · straight link, not crossed (Waveshare doc)</text>
+
+    <!-- ESP32 -->
+    <rect class="hot" x="340" y="250" width="240" height="120" rx="4"/>
+    <text class="t" x="460" y="276" text-anchor="middle" style="font-size:16px">ESP32</text>
+    <text class="m" x="460" y="298" text-anchor="middle">GPIO16 RX · GPIO17 TX</text>
+    <text class="m" x="460" y="316" text-anchor="middle">I²C : D21 SDA · D22 SCL</text>
+    <text class="m" x="460" y="334" text-anchor="middle">HC-SR04 : GPIO27 Trig · GPIO34 Echo</text>
+    <text class="s" x="460" y="352" text-anchor="middle">powered by its USB-C (5 V) · Wi-Fi</text>
+
+    <!-- DC-DC -->
+    <rect class="node" x="340" y="420" width="240" height="64" rx="4"/>
+    <text class="t" x="460" y="448" text-anchor="middle">12 V → 5 V converter</text>
+    <text class="s" x="460" y="467" text-anchor="middle">USB-C output</text>
+    <path class="w pwr" d="M460 420 V370"/>
+    <text class="s" x="470" y="400">USB-C 5 V</text>
+
+    <!-- I2C -->
+    <path class="w i2c" d="M580 268 H650"/>
+    <text class="m" x="615" y="260" text-anchor="middle">I²C</text>
+    <path class="w pwr" d="M580 290 H650"/>
+    <text class="m" x="615" y="308" text-anchor="middle">Vin·GND</text>
+    <rect class="hot" x="650" y="236" width="210" height="64" rx="4"/>
+    <text class="t" x="755" y="262" text-anchor="middle">PCA9548A · 0x70</text>
+    <text class="s" x="755" y="282" text-anchor="middle">I²C multiplexer, 8 channels</text>
+    <path class="w i2c" d="M755 300 V330 M660 330 H968 M660 330 V350 M704 330 V350 M748 330 V350 M792 330 V350 M836 330 V350 M880 330 V350 M924 330 V350 M968 330 V350"/>
+    <g><rect class="node" x="640" y="350" width="40" height="48" rx="3"/><text class="t" x="660" y="372" text-anchor="middle">F</text><text class="m" x="660" y="389" text-anchor="middle">0</text><rect class="node" x="684" y="350" width="40" height="48" rx="3"/><text class="t" x="704" y="372" text-anchor="middle">FL</text><text class="m" x="704" y="389" text-anchor="middle">1</text><rect class="node" x="728" y="350" width="40" height="48" rx="3"/><text class="t" x="748" y="372" text-anchor="middle">L</text><text class="m" x="748" y="389" text-anchor="middle">2</text><rect class="node" x="772" y="350" width="40" height="48" rx="3"/><text class="t" x="792" y="372" text-anchor="middle">BL</text><text class="m" x="792" y="389" text-anchor="middle">3</text><rect class="node" x="816" y="350" width="40" height="48" rx="3"/><text class="t" x="836" y="372" text-anchor="middle">B</text><text class="m" x="836" y="389" text-anchor="middle">4</text><rect class="node" x="860" y="350" width="40" height="48" rx="3"/><text class="t" x="880" y="372" text-anchor="middle">BR</text><text class="m" x="880" y="389" text-anchor="middle">5</text><rect class="node" x="904" y="350" width="40" height="48" rx="3"/><text class="t" x="924" y="372" text-anchor="middle">R</text><text class="m" x="924" y="389" text-anchor="middle">6</text><rect class="node" x="948" y="350" width="40" height="48" rx="3"/><text class="t" x="968" y="372" text-anchor="middle">FR</text><text class="m" x="968" y="389" text-anchor="middle">7</text></g>
+    <text class="s" x="640" y="418">8 × VL53L0X, all at address 0x29 · number = mux channel</text>
+
+    <!-- prévus -->
+    <rect class="plan" x="640" y="440" width="170" height="42" rx="4"/>
+    <text class="t" x="725" y="458" text-anchor="middle">BNO055 (planned)</text>
+    <text class="s" x="725" y="474" text-anchor="middle">main I²C bus</text>
+    <path class="w i2c dash" d="M580 350 H610 V461 H640"/>
+    <rect class="node" x="830" y="440" width="160" height="42" rx="4"/>
+    <text class="t" x="910" y="458" text-anchor="middle">HC-SR04</text>
+    <text class="s" x="910" y="474" text-anchor="middle">Trig GPIO27 · Echo GPIO34</text>
+    <path class="w gnd" d="M580 366 H596 V510 H910 V482"/>
+    <text class="s" x="610" y="528">Echo is 5 V: voltage divider or 3.3 V module</text>
+
+    <!-- légende -->
+    <path class="w pwr" d="M20 340 H52"/><text class="s" x="62" y="344">power</text>
+    <path class="w uart" d="M20 362 H52"/><text class="s" x="62" y="366">servo bus</text>
+    <path class="w i2c" d="M20 384 H52"/><text class="s" x="62" y="388">I²C</text>
+    <path class="w gnd dash" d="M20 406 H52"/><text class="s" x="62" y="410">planned</text>
+  </svg>
