@@ -23,6 +23,9 @@ const char INDEX_HTML[] PROGMEM = R"HTML(<!doctype html>
   h1 { margin: 0; font-size: 18px; letter-spacing: 0.1em; }
   #status { padding: 4px 14px; border-radius: 999px; font-size: 13px; background: #7a2b25; }
   #status.ok { background: #1f5a34; }
+  #floor { padding: 6px 18px; border-radius: 8px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; background: #263634; color: #94a6a2; }
+  #floor.ok { background: #1f5a34; color: #e5eeec; }
+  #floor.bad { background: #b02a21; color: #fff; }
   #pad { width: min(94vw, 440px); height: auto; aspect-ratio: 1; touch-action: none; cursor: grab; }
   .row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: center; font-size: 14px; }
   #info { font-variant-numeric: tabular-nums; color: #94a6a2; }
@@ -37,6 +40,7 @@ const char INDEX_HTML[] PROGMEM = R"HTML(<!doctype html>
 <body>
   <h1>ARMADA</h1>
   <div id="status">Déconnecté</div>
+  <div id="floor">Sol : --</div>
   <canvas id="pad"></canvas>
   <div id="info">vx 0.00 m/s · vw 0.00 rad/s</div>
   <div class="row">
@@ -59,6 +63,18 @@ const char INDEX_HTML[] PROGMEM = R"HTML(<!doctype html>
   var stick = { x: 0, y: 0 }, dragging = false, keys = {}, lidar = [], connected = false, busy = false;
   var elStatus = document.getElementById('status'), elInfo = document.getElementById('info');
   var elSp = document.getElementById('sp'), elSpv = document.getElementById('spv');
+
+  // Capteur ultrason vers le sol : distance nominale mesurée à la règle (cm) et tolérance
+  var FLOOR_NOM = 5.0, FLOOR_TOL = 2.0;
+  var elFloor = document.getElementById('floor');
+  function showFloor(d) {
+    if (d === null || d === undefined) {
+      elFloor.textContent = 'Sol : -- (pas d\'écho)'; elFloor.className = 'bad'; return;
+    }
+    var cm = d * 100;
+    elFloor.textContent = 'Sol : ' + cm.toFixed(1) + ' cm';
+    elFloor.className = Math.abs(cm - FLOOR_NOM) <= FLOOR_TOL ? 'ok' : 'bad';
+  }
 
   function scale() { return elSp.value / 100; }
   elSp.addEventListener('input', function () { elSpv.textContent = elSp.value; });
@@ -122,10 +138,11 @@ const char INDEX_HTML[] PROGMEM = R"HTML(<!doctype html>
       .then(function (r) { return r.json(); })
       .then(function (j) {
         lidar = j.lidar || [];
+        showFloor(j.floor);
         elInfo.textContent = 'vx ' + j.vx.toFixed(2) + ' m/s · vw ' + j.vw.toFixed(2) + ' rad/s';
         setStatus(true); draw();
       })
-      .catch(function () { setStatus(false); })
+      .catch(function () { setStatus(false); elFloor.textContent = 'Sol : --'; elFloor.className = ''; })
       .then(function () { clearTimeout(to); busy = false; });
   }
   setInterval(tick, 100);

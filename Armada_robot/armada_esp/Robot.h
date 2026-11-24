@@ -1,6 +1,7 @@
 #pragma once
 #include "Motor.h"
 #include "tof.h"
+#include "ultrasonic.h"
 
 class Robot
 {
@@ -18,6 +19,8 @@ public:
      * @param tof_sda I2C SDA pin of the ToF multiplexer
      * @param tof_scl I2C SCL pin of the ToF multiplexer
      * @param tof_mux_address I2C address of the PCA9548A
+     * @param floor_trig_pin  Trig pin of the HC-SR04 (floor sensor)
+     * @param floor_echo_pin  Echo pin of the HC-SR04 (5 V -> voltage divider needed)
      */
     Robot(float wheel_diameter,
           float robot_width,
@@ -30,7 +33,9 @@ public:
           bool left_inverted = true,
           int tof_sda = 21,
           int tof_scl = 22,
-          uint8_t tof_mux_address = 0x70);
+          uint8_t tof_mux_address = 0x70,
+          int floor_trig_pin = 27,
+          int floor_echo_pin = 34);
 
     /** Initialise les moteurs et le lidar ToF. À appeler une seule fois, dans setup(). */
     void init();
@@ -102,6 +107,18 @@ public:
      */
     uint8_t get_lidar_values(float *values, uint8_t capacity) const;
 
+    /**
+     * Capteur à ultrasons HC-SR04 (incliné vers le sol, détection de vide).
+     * Exemple : robot.floor_sensor().update(); (à appeler dans loop(), limite sa cadence seul)
+     */
+    UltrasonicSensor &floor_sensor() { return _floor_sensor; }
+
+    /**
+     * Dernière distance du HC-SR04 en mètres, ou NAN si la mesure est invalide
+     * (pas d'écho, hors portée). Tester avec isnan().
+     */
+    float get_floor_distance() const;
+
 private:
     /** linear speed (m/s) of a wheel in RPM. */
     float wheel_speed_to_rpm(float wheel_speed_ms) const;
@@ -131,4 +148,5 @@ private:
     bool _odom_started = false;
 
     TofLidar _lidar;
+    UltrasonicSensor _floor_sensor;
 };

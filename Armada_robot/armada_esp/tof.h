@@ -3,14 +3,13 @@
 #include <Wire.h>
 #include <Adafruit_VL53L0X.h>
 
-// Nombre maximum de capteurs ToF qu'un TofLidar peut piloter
 // (le multiplexeur PCA9548A expose 8 canaux).
 #define MAX_TOF_SENSORS 8
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  TofSensor : un VL53L0X derrière un canal du multiplexeur I2C.
 //  Il connaît son nom (F, FL, ...), son canal et sa dernière mesure.
-//  Il ne gère PAS le multiplexeur : c'est TofLidar qui sélectionne le canal
+//  Il ne gère pas le multiplexeur : c'est TofLidar qui sélectionne le canal
 //  avant d'appeler init() ou update().
 // ─────────────────────────────────────────────────────────────────────────────
 class TofSensor
@@ -68,7 +67,7 @@ private:
 //  TofLidar : possède le multiplexeur et les TofSensor. Il indique simplement
 //  quel capteur voit quelle distance, sans position ni géométrie.
 //
-//  Utilisation (en général via Robot, qui s'en charge) :
+//  Utilisation (en général via classe Robot) :
 //    TofLidar lidar;                  // ne touche pas au matériel
 //    lidar.add_sensor("F", 0);        // nom + canal du multiplexeur
 //    lidar.add_sensor("FL", 1);

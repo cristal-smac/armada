@@ -27,6 +27,9 @@
 #define TOF_SCL 22
 #define TOF_MUX_ADDRESS 0x70
 
+#define FLOOR_TRIG_PIN 27 // HC-SR04 Trig
+#define FLOOR_ECHO_PIN 34 // HC-SR04 Echo (5 V -> diviseur de tension)
+
 // ─── Commande ───────────────────────────────────────────────────────────────
 #define MAX_LINEAR_SPEED 0.20f  // m/s, joystick à fond vers l'avant
 #define MAX_ANGULAR_SPEED 2.0f  // rad/s, joystick à fond sur le côté
@@ -51,7 +54,9 @@ Robot robot(WHEEL_DIAMETER,
             LEFT_INVERTED,
             TOF_SDA,
             TOF_SCL,
-            TOF_MUX_ADDRESS);
+            TOF_MUX_ADDRESS,
+            FLOOR_TRIG_PIN,
+            FLOOR_ECHO_PIN);
 
 WebServer server(WEB_PORT);
 
@@ -92,7 +97,8 @@ void send_state()
         json += isnan(values[i]) ? String("null") : String(values[i], 3);
         json += '}';
     }
-    json += "]}";
+    float floor_m = robot.get_floor_distance();
+    json += "],\"floor\":" + (isnan(floor_m) ? String("null") : String(floor_m, 3)) + "}";
 
     server.sendHeader("Cache-Control", "no-store");
     server.send(200, "application/json", json);
@@ -170,5 +176,6 @@ void loop()
 {
     server.handleClient();       // reçoit les commandes de la page
     robot.update();              // arret si plus de commande
+    robot.floor_sensor().update(); // HC-SR04 : une mesure toutes les 60 ms
     robot.lidar().update_next(); // un capteur ToF par tour (environ 46 ms en mesurant pendant les tests)
 }

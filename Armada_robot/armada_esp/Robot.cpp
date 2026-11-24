@@ -27,7 +27,9 @@ Robot::Robot(float wheel_diameter,
              bool left_inverted,
              int tof_sda,
              int tof_scl,
-             uint8_t tof_mux_address)
+             uint8_t tof_mux_address,
+             int floor_trig_pin,
+             int floor_echo_pin)
     : _left_motor(left_motor_id, rx_motors, tx_motors, motors_baudrate),
       _right_motor(right_motor_id, rx_motors, tx_motors, motors_baudrate),
       _wheel_circumference(M_PI * wheel_diameter),
@@ -38,7 +40,8 @@ Robot::Robot(float wheel_diameter,
       _last_command_ms(0),
       _moving(false),
       _timeout_logged(false),
-      _lidar(tof_mux_address, tof_sda, tof_scl)
+      _lidar(tof_mux_address, tof_sda, tof_scl),
+      _floor_sensor(floor_trig_pin, floor_echo_pin)
 {
 }
 
@@ -59,6 +62,13 @@ void Robot::init()
     _lidar.add_sensor("R", 6);  // right
     _lidar.add_sensor("FR", 7); // front right
     _lidar.init();
+
+    _floor_sensor.init();
+}
+
+float Robot::get_floor_distance() const
+{
+    return _floor_sensor.valid() ? _floor_sensor.distance_mm() / 1000.0f : NAN;
 }
 
 bool Robot::set_velocity(float vx, float vw)
