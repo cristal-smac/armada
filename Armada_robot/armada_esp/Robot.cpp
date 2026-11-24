@@ -124,6 +124,53 @@ void Robot::get_velocities(float &vx, float &vw)
     // Serial.printf("[Robot] get_velocities → vx=%.3f m/s  vw=%.3f rad/s\n", vx, vw);
 }
 
+bool Robot::update_odometry()
+{
+    float left_rev, right_rev;
+    if (!_left_motor.get_position_rev(left_rev))
+        return false;
+    delay(5);
+    if (!_right_motor.get_position_rev(right_rev))
+        return false;
+
+    // Même convention de sens que set_velocity() : avancer = positif pour les deux roues.
+    if (_left_inverted)
+        left_rev = -left_rev;
+    else
+        right_rev = -right_rev;
+
+    if (!_odom_started)
+    {
+        // Première lecture : simple référence, pas de déplacement.
+        _last_left_rev = left_rev;
+        _last_right_rev = right_rev;
+        _odom_started = true;
+        return true;
+    }
+
+    float d_left = (left_rev - _last_left_rev) * _wheel_circumference;
+    float d_right = (right_rev - _last_right_rev) * _wheel_circumference;
+    _last_left_rev = left_rev;
+    _last_right_rev = right_rev;
+
+    float d = (d_left + d_right) / 2.0f;
+    float d_theta = (d_right - d_left) / _robot_width;
+
+    // Intégration au cap moyen sur l'intervalle.
+    float mid = _odom_theta + d_theta / 2.0f;
+    _odom_x += d * cosf(mid);
+    _odom_y += d * sinf(mid);
+    _odom_theta += d_theta;
+    return true;
+}
+
+void Robot::get_odometry(float &x, float &y, float &theta) const
+{
+    x = _odom_x;
+    y = _odom_y;
+    theta = _odom_theta;
+}
+
 void Robot::stop()
 {
     bool left_ok = _left_motor.stop();

@@ -53,6 +53,21 @@ public:
      */
     void get_velocities(float &vx, float &vw);
 
+    /**
+     * Odométrie : intègre le déplacement des roues depuis le dernier appel.
+     * À appeler régulièrement (au moins plusieurs fois par tour de roue), ex. dans loop().
+     * @return false si un moteur n'a pas répondu (rien n'est mis à jour)
+     */
+    bool update_odometry();
+
+    /**
+     * Pose estimée depuis le démarrage (repère de départ du robot).
+     * @param x      position en m (avant = +x au départ)
+     * @param y      position en m
+     * @param theta  cap en rad (anti-horaire positif)
+     */
+    void get_odometry(float &x, float &y, float &theta) const;
+
     /** stops the motors */
     void stop();
 
@@ -106,6 +121,14 @@ private:
     uint32_t _last_command_ms;    // instant du dernier set_velocity() réussi
     bool _moving;                 // true si une consigne non nulle est active (ou si un arrêt a échoué)
     bool _timeout_logged;         // évite de répéter le message de sécurité
+
+    // Odométrie
+    float _odom_x = 0.0f;
+    float _odom_y = 0.0f;
+    float _odom_theta = 0.0f;
+    float _last_left_rev = 0.0f;
+    float _last_right_rev = 0.0f;
+    bool _odom_started = false;
 
     TofLidar _lidar;
 };

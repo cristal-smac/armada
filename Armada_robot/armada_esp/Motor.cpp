@@ -74,6 +74,28 @@ float Motor::get_speed_rpm()
     return rpm;
 }
 
+bool Motor::get_position_rev(float &rev)
+{
+    int pos = _sms_sts.ReadPos(_id);
+    if (pos == -1)
+    {
+        return false;
+    }
+    if (_last_pos != -1)
+    {
+        int delta = pos - _last_pos;
+        // Passage par 0 / 4095 : on prend le chemin le plus court.
+        if (delta > POS_RANGE / 2)
+            delta -= POS_RANGE;
+        else if (delta < -POS_RANGE / 2)
+            delta += POS_RANGE;
+        _total_ticks += delta;
+    }
+    _last_pos = pos;
+    rev = static_cast<float>(_total_ticks) / POS_RANGE;
+    return true;
+}
+
 bool Motor::stop()
 {
     for (int attempt = 0; attempt < STOP_ATTEMPTS; ++attempt)
