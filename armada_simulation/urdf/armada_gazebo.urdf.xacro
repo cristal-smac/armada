@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+  ARMADA pour Gazebo : le URDF de armada_description (inchangé, il est généré) + moteurs, capteurs et frictions.
+  Tous les noms de topics et de frames sont préfixés par robot_name : on peut spawner autant de robots que voulu.
+  Les topics Gazebo sont /<robot_name>/..., les mêmes noms que côté ROS (voir spawn_robot.launch.py).
+-->
+<robot name="armada" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="robot_name" default="armada1"/>
+  <xacro:property name="ns" value="$(arg robot_name)"/>
+
+  <xacro:include filename="$(find armada_description)/urdf/armada.urdf"/>
+
+  <!-- Moteurs : pilotés par /<ns>/gz/cmd_vel (sortie de cmd_vel_filter), odométrie sur /<ns>/odom -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>wheel_left_joint</left_joint>
+      <right_joint>wheel_right_joint</right_joint>
+      <!-- géométrie du URDF : roues à y = ±0.04775, rayon 0.0385963 -->
+      <wheel_separation>0.0955</wheel_separation>
+      <wheel_radius>0.0385963</wheel_radius>
+      <topic>/${ns}/gz/cmd_vel</topic>
+      <odom_topic>/${ns}/odom</odom_topic>
+      <frame_id>${ns}/odom</frame_id>
+      <child_frame_id>${ns}/base_footprint</child_frame_id>
+      <odom_publisher_frequency>20</odom_publisher_frequency>
+      <max_linear_velocity>0.25</max_linear_velocity>
+      <max_angular_velocity>5.5</max_angular_velocity>
+    </plugin>
+  </gazebo>
+
+  <!-- Frictions : roues qui accrochent, bille de caster qui glisse -->
+  <gazebo reference="wheel_left_link"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
+  <gazebo reference="wheel_right_link"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
+  <gazebo reference="caster_link"><mu1>0.01</mu1><mu2>0.01</mu2></gazebo>
+
+  <!--
+    Anneau de 8 VL53L0X = un lidar de 8 rayons, au centre de l'anneau (lidar_link), un tous les 45° à partir de
+    l'avant, dans l'ordre F FL L BL B BR R FR. Même LaserScan que celui publié par le firmware.
+    min = 0.04 m : les cartes ToF sont à 3.5 cm du centre et seraient vues par les rayons en dessous.
+  -->
+  <gazebo reference="lidar_link">
+    <sensor name="tof_ring" type="gpu_lidar">
+      <gz_frame_id>${ns}/lidar_link</gz_frame_id>
+      <topic>/${ns}/scan</topic>
+      <update_rate>5</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>8</samples>
+            <resolution>1</resolution>
+            <min_angle>0</min_angle>
+            <max_angle>5.497787</max_angle>
+          </horizontal>
+        </scan>
+        <range><min>0.04</min><max>1.2</max><resolution>0.001</resolution></range>
+        <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- HC-SR04 de sol : 1 rayon le long de l'axe x de ultrasonic_link (incliné à 45° vers le bas) -->
+  <gazebo reference="ultrasonic_link">
+    <sensor name="floor_sensor" type="gpu_lidar">
+      <gz_frame_id>${ns}/ultrasonic_link</gz_frame_id>
+      <topic>/${ns}/gz/floor_scan</topic>
+      <update_rate>15</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <lidar>
+        <scan>
+          <horizontal><samples>1</samples><resolution>1</resolution><min_angle>0</min_angle><max_angle>0</max_angle></horizontal>
+        </scan>
+        <range><min>0.02</min><max>0.4</max><resolution>0.001</resolution></range>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU (BNO055 prévu : pas encore dans le firmware, position supposée dans le URDF) -->
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+      <gz_frame_id>${ns}/imu_link</gz_frame_id>
+      <topic>/${ns}/imu/data</topic>
+      <update_rate>50</update_rate>
+      <always_on>true</always_on>
+    </sensor>
+  </gazebo>
+</robot>

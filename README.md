@@ -34,6 +34,10 @@ Once it is built and flashed, join the `ARMADA-XXXX` Wi-Fi network and open `htt
 
 ```
 Armada_robot/armada_esp/   firmware (open armada_esp.ino in the Arduino IDE)
+Armada_robot/armada_esp_micro_ros/  same robot driven by ROS 2 (micro-ROS) instead of the web page
+armada_description/        URDF + meshes
+armada_ros/                ROS 2 interface on the PC, identical for the real and the simulated robot
+armada_simulation/         Gazebo multi-robot simulation
 tests/                     standalone hardware test sketches
 docs/                      guides
 images/                    CAD pictures and wiring diagram

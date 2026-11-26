@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>armada_ros</name>
+  <version>0.1.0</version>
+  <description>Interface ROS 2 commune au robot ARMADA réel (micro-ROS) et simulé (armada_simulation) : bringup par robot, multi-robot via namespaces.</description>
+  <maintainer email="erwan.martin666@gmail.com">Erwan</maintainer>
+  <license>GPL-3.0-only</license>
+
+  <exec_depend>armada_description</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>rqt_robot_steering</exec_depend>
+  <!-- Robot réel : pont micro-ROS (à installer depuis les sources : voir README) -->
+  <exec_depend>micro_ros_agent</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

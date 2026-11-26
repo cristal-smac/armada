@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>armada_simulation</name>
+  <version>0.1.0</version>
+  <description>Simulation Gazebo (multi-robot) du robot ARMADA, pilotable avec exactement les mêmes topics que le robot réel (armada_ros).</description>
+  <maintainer email="erwan.martin666@gmail.com">Erwan</maintainer>
+  <license>GPL-3.0-only</license>
+
+  <exec_depend>armada_description</exec_depend>
+  <exec_depend>armada_ros</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
